@@ -5,7 +5,7 @@ import ListMain from "../../components/ListMain";
 import ModalFormPlat from "../../components/ModalFormPlat";
 
 const Dashboard = () => {
-  const { Header, Content, Footer, Sider } = Layout;
+  const { Content, Footer, Sider } = Layout;
   const { Title } = Typography;
   const items = [UserOutlined].map((icon, index) => ({
     key: "1",
