@@ -1,14 +1,12 @@
 import { useMutation } from "@apollo/client";
 import { Button, Modal } from "antd";
 import React, { useState } from "react";
-import { MutationCreatePlat } from "../apollo/Mutation";
-import { Plat } from "../mock/PlatMock";
+import { MutationEditPlat } from "../apollo/Mutation";
 
-const ModalFormPlat = () => {
+const ModalFormEditPlat = (props) => {
   const [showModal, setShowModal] = useState(false);
-  const [createPlat, { data: dataPlat, error: errPlat }] =
-    useMutation(MutationCreatePlat);
-  const [plat, setPlat] = useState(Plat);
+  const [plat, setPlat] = useState(props.data);
+  const [createPlat, { data }] = useMutation(MutationEditPlat);
 
   const onChangeHandler = (e) => {
     setPlat({ ...plat, [e.target.name]: e.target.value });
@@ -18,29 +16,27 @@ const ModalFormPlat = () => {
     e.preventDefault();
     createPlat({
       variables: {
-        objects: {
+        _eq: props.id,
+        _set: {
           Plat: plat.Plat,
-          Nama: plat.Nama,
-          Keterangan: plat.Keterangan,
-          Free: plat.Free,
-          Saldo: plat.Saldo,
-          Status: plat.Status,
           ID_Plat: plat.ID_Plat,
+          Nama: plat.Nama,
           Plat_Nomor: plat.Plat,
+          Status: plat.Status,
+          Saldo: plat.Saldo,
+          Free: plat.Free,
+          Keterangan: plat.Keterangan,
         },
       },
     });
     console.log("Plat", plat);
+    console.log("data", data);
     setShowModal(false);
   };
   return (
     <>
-      <Button
-        type="primary"
-        style={{ margin: "15px 0" }}
-        onClick={() => setShowModal(true)}
-      >
-        Add Data
+      <Button type="primary" onClick={() => setShowModal(true)}>
+        Edit
       </Button>
       <Modal
         title="Tambah Plat Kendaraan"
@@ -60,7 +56,8 @@ const ModalFormPlat = () => {
             type="text"
             id="Plat"
             name="Plat"
-            placeholder="D 4244 XX"
+            placeholder={props.data.Plat}
+            value={plat.Plat}
             onChange={onChangeHandler}
           />
           <label htmlFor="ID_Plat">ID Plat</label>
@@ -68,7 +65,8 @@ const ModalFormPlat = () => {
             type="text"
             id="ID_Plat"
             name="ID_Plat"
-            placeholder="NIP atau NIM"
+            placeholder={props.data.ID_Plat}
+            value={plat.ID_Plat}
             onChange={onChangeHandler}
           />
           <label htmlFor="Nama">Nama</label>
@@ -76,7 +74,8 @@ const ModalFormPlat = () => {
             type="text"
             id="Nama"
             name="Nama"
-            placeholder="Full Name"
+            placeholder={props.data.Nama}
+            value={plat.Nama}
             onChange={onChangeHandler}
           />
           <textarea
@@ -84,7 +83,8 @@ const ModalFormPlat = () => {
             type="textarea"
             id="Keterangan"
             name="Keterangan"
-            placeholder="Keterangan"
+            placeholder={props.data.Keterangan}
+            value={plat.Keterangan}
             onChange={onChangeHandler}
           />
           <label htmlFor="Free">Free</label>
@@ -92,7 +92,8 @@ const ModalFormPlat = () => {
             type="number"
             id="Free"
             name="Free"
-            placeholder="0"
+            placeholder={props.data.Free}
+            value={plat.Free}
             onChange={onChangeHandler}
           />
           <label htmlFor="Saldo">Saldo</label>
@@ -100,11 +101,17 @@ const ModalFormPlat = () => {
             type="number"
             id="Saldo"
             name="Saldo"
-            placeholder="0"
+            placeholder={props.data.Saldo}
+            value={plat.Saldo}
             onChange={onChangeHandler}
           />
           <label htmlFor="Status">Status</label>
-          <select onChange={onChangeHandler} name="Status" id="Status">
+          <select
+            onChange={onChangeHandler}
+            name="Status"
+            id="Status"
+            value={plat.Status}
+          >
             <option value="">Pilih Status</option>
             <option value="Mahasiswa">Mahasiswa</option>
             <option value="Karyawan">Karyawan</option>
@@ -115,4 +122,4 @@ const ModalFormPlat = () => {
   );
 };
 
-export default ModalFormPlat;
+export default ModalFormEditPlat;
