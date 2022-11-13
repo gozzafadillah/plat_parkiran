@@ -14,3 +14,18 @@ export const QueryGetPlat = gql`
     }
   }
 `;
+
+export const QueryGetByName = gql`
+  query GetByName($_iregex: String!) {
+    Plat_Kendaraan(where: { Nama: { _iregex: $_iregex } }) {
+      Free
+      ID_Plat
+      Keterangan
+      Nama
+      Plat_Nomor
+      Plat
+      Saldo
+      Status
+    }
+  }
+`;

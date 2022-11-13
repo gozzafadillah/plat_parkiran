@@ -1,19 +1,29 @@
 import { useLazyQuery, useMutation, useSubscription } from "@apollo/client";
 import { Button, Card, Modal } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import { MutationDeletePlat } from "../apollo/Mutation";
-import { QueryGetPlat } from "../apollo/Query";
+import { QueryGetByName, QueryGetPlat } from "../apollo/Query";
 import { SubscriptionGetPlat } from "../apollo/Subscription";
 import ModalFormEditPlat from "./ModalFormEditPlat";
 
 const ListMain = () => {
   const { data: dataPlats } = useSubscription(SubscriptionGetPlat);
   const [getPlat, { data: dataPlat }] = useLazyQuery(QueryGetPlat);
-  const [getSearch, { data: searchPlat }] = useLazyQuery(QueryGetPlat);
+  const [getSearch, { data: searchPlat }] = useLazyQuery(QueryGetByName);
   const [showModal, setShowModal] = useState(false);
   const [deletePlat, { error: errorDelPlat }] = useMutation(MutationDeletePlat);
   const [plat, setPlat] = useState({
     name: "",
+  });
+
+  const socket = io("http://192.168.1.25:5000");
+
+  useEffect(() => {
+    socket.on("event", (data) => {
+      let t = JSON.parse(data.toString("utf8"));
+      console.log(t);
+    });
   });
 
   const showPlat = (plat) => {
@@ -36,7 +46,7 @@ const ListMain = () => {
   const onChangeHandler = (e) => {
     let name = e.target.name;
     let value = e.target.value;
-    if (name === "Plat") {
+    if (name === "Nama") {
       setPlat(value);
     }
   };
@@ -45,7 +55,7 @@ const ListMain = () => {
     e.preventDefault();
     getSearch({
       variables: {
-        plat: plat,
+        _iregex: plat,
       },
     });
   };
@@ -65,10 +75,10 @@ const ListMain = () => {
         >
           <input
             type="text"
-            name="Plat"
-            id="Plat"
+            name="Nama"
+            id="Nama"
             style={{ textAlign: "center" }}
-            placeholder="Cari Plat"
+            placeholder="Cari Nama"
             onChange={onChangeHandler}
           />
           <Button onClick={(e) => searchHandler(e)}>Search</Button>
@@ -83,69 +93,59 @@ const ListMain = () => {
             </tr>
           </thead>
           <tbody>
-            {searchPlat === undefined ||
-            searchPlat?.Plat_Kendaraan.length === 0 ? (
-              dataPlats?.Plat_Kendaraan.map((data) => (
-                <tr key={data.Plat}>
-                  <td>{data.Plat}</td>
-                  <td>{data.Nama}</td>
-                  <td>{data.Status}</td>
-                  <td
-                    style={{
-                      display: "flex",
-                      gap: 4,
-                    }}
-                  >
-                    <Button onClick={() => showPlat(data.Plat)}>View</Button>
-                    <ModalFormEditPlat data={data} id={data.Plat} />
-                    <Button
-                      onClick={() => {
-                        deletePlatData(data.Plat);
+            {searchPlat === undefined || searchPlat?.Plat_Kendaraan.length === 2
+              ? dataPlats?.Plat_Kendaraan.map((data) => (
+                  <tr key={data.Plat}>
+                    <td>{data.Plat}</td>
+                    <td>{data.Nama}</td>
+                    <td>{data.Status}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        gap: 4,
                       }}
-                      type="danger"
                     >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td>{searchPlat?.Plat_Kendaraan[0]?.Plat}</td>
-                <td>{searchPlat?.Plat_Kendaraan[0]?.Nama}</td>
-                <td>{searchPlat?.Plat_Kendaraan[0]?.Status}</td>
-                <td
-                  style={{
-                    display: "flex",
-                    gap: 4,
-                  }}
-                >
-                  <Button
-                    onClick={() =>
-                      showPlat(searchPlat?.Plat_Kendaraan[0]?.Plat)
-                    }
-                  >
-                    View
-                  </Button>
-                  <ModalFormEditPlat
-                    data={searchPlat?.Plat_Kendaraan[0]}
-                    id={searchPlat?.Plat_Kendaraan[0]?.Plat}
-                  />
-                  {!errorDelPlat ? (
-                    <Button
-                      onClick={() => {
-                        deletePlatData(searchPlat?.Plat_Kendaraan[0]?.Plat);
+                      <Button onClick={() => showPlat(data.Plat)}>View</Button>
+                      <ModalFormEditPlat data={data} id={data.Plat} />
+                      <Button
+                        onClick={() => {
+                          deletePlatData(data.Plat);
+                        }}
+                        type="danger"
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              : searchPlat?.Plat_Kendaraan.map((data) => (
+                  <tr>
+                    <td>{data.Plat}</td>
+                    <td>{data.Nama}</td>
+                    <td>{data.Status}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        gap: 4,
                       }}
-                      type="danger"
                     >
-                      Delete
-                    </Button>
-                  ) : (
-                    alert("delete error ", errorDelPlat)
-                  )}
-                </td>
-              </tr>
-            )}
+                      <Button onClick={() => showPlat(data.Plat)}>View</Button>
+                      <ModalFormEditPlat data={data} id={data.Plat} />
+                      {!errorDelPlat ? (
+                        <Button
+                          onClick={() => {
+                            deletePlatData(searchPlat?.Plat_Kendaraan[0]?.Plat);
+                          }}
+                          type="danger"
+                        >
+                          Delete
+                        </Button>
+                      ) : (
+                        alert("delete error ", errorDelPlat)
+                      )}
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </Card>
