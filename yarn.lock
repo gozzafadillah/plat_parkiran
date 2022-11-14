@@ -5054,7 +5054,7 @@
   dependencies:
     "tslib" "^2.1.0"
 
-"graphql-ws@^5.11.2", "graphql-ws@^5.5.5":
+"graphql-ws@^5.5.5":
   "integrity" "sha512-4EiZ3/UXYcjm+xFGP544/yW1+DVI8ZpKASFbzrV5EDTFWJp0ZvLl4Dy2fSZAzz9imKp5pZMIcjB0x/H69Pv/6w=="
   "resolved" "https://registry.npmjs.org/graphql-ws/-/graphql-ws-5.11.2.tgz"
   "version" "5.11.2"

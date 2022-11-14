@@ -1,35 +1,61 @@
 import { gql } from "@apollo/client";
 
 export const MutationCreatePlat = gql`
-  mutation MyMutation($objects: [Plat_Kendaraan_insert_input!] = {}) {
-    insert_Plat_Kendaraan(objects: $objects) {
-      returning {
-        Plat
-        Nama
-        ID_Plat
-        Plat_Nomor
-        Status
-      }
+  mutation MutationCreatePlat(
+    $plat: String!
+    $nama: String!
+    $id_plat: String!
+    $status: String!
+    $keterangan: String!
+    $plat_nomor: String!
+    $free: Int!
+    $saldo: Int!
+  ) {
+    createPlat(
+      plat: $plat
+      nama: $nama
+      id_plat: $id_plat
+      status: $status
+      keterangan: $keterangan
+      plat_nomor: $plat_nomor
+      free: $free
+      saldo: $saldo
+    ) {
+      plat
     }
   }
 `;
 
 export const MutationDeletePlat = gql`
-  mutation DeletePlat($Plat: String = "") {
-    delete_Plat_Kendaraan_by_pk(Plat: $Plat) {
-      Nama
-      ID_Plat
+  mutation MutationDeletePlat($plat: String!) {
+    deletePlat(plat: $plat) {
+      nama
     }
   }
 `;
 
 export const MutationEditPlat = gql`
-  mutation EditPlat($_eq: String!, $_set: Plat_Kendaraan_set_input = {}) {
-    update_Plat_Kendaraan(where: { Plat: { _eq: $_eq } }, _set: $_set) {
-      returning {
-        Plat
-        Nama
-      }
+  mutation MutationEditPlat(
+    $plat: String!
+    $nama: String!
+    $id_plat: String!
+    $status: String!
+    $keterangan: String!
+    $plat_nomor: String!
+    $free: Int!
+    $saldo: Int!
+  ) {
+    updatePlat(
+      plat: $plat
+      nama: $nama
+      id_plat: $id_plat
+      status: $status
+      keterangan: $keterangan
+      plat_nomor: $plat_nomor
+      free: $free
+      saldo: $saldo
+    ) {
+      plat
     }
   }
 `;

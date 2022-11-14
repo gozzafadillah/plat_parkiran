@@ -1,12 +1,28 @@
 import { useMutation } from "@apollo/client";
 import { Button, Modal } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MutationEditPlat } from "../apollo/Mutation";
+import { GetPlats } from "../apollo/Query";
 
 const ModalFormEditPlat = (props) => {
   const [showModal, setShowModal] = useState(false);
-  const [plat, setPlat] = useState(props.data);
-  const [createPlat, { data }] = useMutation(MutationEditPlat);
+  const [plat, setPlat] = useState({});
+  const [createPlat, { data }] = useMutation(MutationEditPlat, {
+    refetchQueries: [GetPlats],
+  });
+
+  useEffect(() => {
+    setPlat({
+      plat: props.data.plat,
+      nama: props.data.nama,
+      id_plat: props.data.id_plat,
+      status: props.data.status,
+      keterangan: props.data.keterangan,
+      plat_nomor: props.data.plat_nomor,
+      free: props.data.free,
+      saldo: props.data.saldo,
+    });
+  }, []);
 
   const onChangeHandler = (e) => {
     setPlat({ ...plat, [e.target.name]: e.target.value });
@@ -16,17 +32,14 @@ const ModalFormEditPlat = (props) => {
     e.preventDefault();
     createPlat({
       variables: {
-        _eq: props.id,
-        _set: {
-          Plat: plat.Plat,
-          ID_Plat: plat.ID_Plat,
-          Nama: plat.Nama,
-          Plat_Nomor: plat.Plat,
-          Status: plat.Status,
-          Saldo: plat.Saldo,
-          Free: plat.Free,
-          Keterangan: plat.Keterangan,
-        },
+        plat: props.id,
+        id_plat: plat.id_plat,
+        nama: plat.nama,
+        plat_nomor: plat.plat,
+        status: plat.status,
+        saldo: plat.saldo,
+        free: plat.free,
+        keterangan: plat.keterangan,
       },
     });
     console.log("Plat", plat);
@@ -39,7 +52,7 @@ const ModalFormEditPlat = (props) => {
         Edit
       </Button>
       <Modal
-        title="Tambah Plat Kendaraan"
+        title={`Edit plat kendaraan ${props.data.plat}`}
         centered
         visible={showModal}
         onOk={(e) => handleSubmit(e)}
@@ -51,66 +64,66 @@ const ModalFormEditPlat = (props) => {
             flexDirection: "column",
           }}
         >
-          <label htmlFor="Plat">Plat</label>
+          <label htmlFor="plat">Plat</label>
           <input
             type="text"
-            id="Plat"
-            name="Plat"
-            placeholder={props.data.Plat}
-            value={plat.Plat}
+            id="plat"
+            name="plat"
+            placeholder={props.data.plat}
+            value={plat?.plat}
             onChange={onChangeHandler}
           />
-          <label htmlFor="ID_Plat">ID Plat</label>
+          <label htmlFor="id_plat">ID Plat</label>
           <input
             type="text"
-            id="ID_Plat"
-            name="ID_Plat"
-            placeholder={props.data.ID_Plat}
-            value={plat.ID_Plat}
+            id="id_plat"
+            name="id_plat"
+            placeholder={props.data.id_plat}
+            value={plat?.id_plat}
             onChange={onChangeHandler}
           />
-          <label htmlFor="Nama">Nama</label>
+          <label htmlFor="nama">Nama</label>
           <input
             type="text"
-            id="Nama"
-            name="Nama"
-            placeholder={props.data.Nama}
-            value={plat.Nama}
+            id="nama"
+            name="nama"
+            placeholder={props.data.nama}
+            value={plat?.nama}
             onChange={onChangeHandler}
           />
           <textarea
             style={{ margin: "15px 0" }}
             type="textarea"
-            id="Keterangan"
-            name="Keterangan"
-            placeholder={props.data.Keterangan}
-            value={plat.Keterangan}
+            id="keterangan"
+            name="keterangan"
+            placeholder={props.data.keterangan}
+            value={plat?.keterangan}
             onChange={onChangeHandler}
           />
-          <label htmlFor="Free">Free</label>
+          <label htmlFor="free">Free</label>
           <input
             type="number"
-            id="Free"
-            name="Free"
-            placeholder={props.data.Free}
-            value={plat.Free}
+            id="free"
+            name="free"
+            placeholder={props.data.free}
+            value={plat?.free}
             onChange={onChangeHandler}
           />
           <label htmlFor="Saldo">Saldo</label>
           <input
             type="number"
-            id="Saldo"
-            name="Saldo"
-            placeholder={props.data.Saldo}
-            value={plat.Saldo}
+            id="saldo"
+            name="saldo"
+            placeholder={props.data.saldo}
+            value={plat?.saldo}
             onChange={onChangeHandler}
           />
           <label htmlFor="Status">Status</label>
           <select
             onChange={onChangeHandler}
-            name="Status"
-            id="Status"
-            value={plat.Status}
+            name="status"
+            id="status"
+            value={plat?.status}
           >
             <option value="">Pilih Status</option>
             <option value="Mahasiswa">Mahasiswa</option>
