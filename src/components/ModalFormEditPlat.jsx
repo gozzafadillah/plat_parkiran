@@ -29,8 +29,6 @@ const ModalFormEditPlat = (props) => {
         },
       },
     });
-    console.log("Plat", plat);
-    console.log("data", data);
     setShowModal(false);
   };
   return (

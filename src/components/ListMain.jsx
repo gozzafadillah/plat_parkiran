@@ -1,29 +1,19 @@
-import { useLazyQuery, useMutation, useSubscription } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { Button, Card, Modal } from "antd";
 import React, { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import { MutationDeletePlat } from "../apollo/Mutation";
 import { QueryGetByName, QueryGetPlat } from "../apollo/Query";
-import { SubscriptionGetPlat } from "../apollo/Subscription";
 import ModalFormEditPlat from "./ModalFormEditPlat";
 
-const ListMain = () => {
-  const { data: dataPlats } = useSubscription(SubscriptionGetPlat);
-  const [getPlat, { data: dataPlat }] = useLazyQuery(QueryGetPlat);
-  const [getSearch, { data: searchPlat }] = useLazyQuery(QueryGetByName);
+const ListMain = (props) => {
   const [showModal, setShowModal] = useState(false);
   const [deletePlat, { error: errorDelPlat }] = useMutation(MutationDeletePlat);
+  const [getPlatByName, { Data: dataPlatByName }] =
+    useLazyQuery(QueryGetByName);
+  const [getPlat, { Data: dataPlat }] = useLazyQuery(QueryGetPlat);
   const [plat, setPlat] = useState({
+    plat: "",
     name: "",
-  });
-
-  const socket = io("http://192.168.1.25:5000");
-
-  useEffect(() => {
-    socket.on("event", (data) => {
-      let t = JSON.parse(data.toString("utf8"));
-      console.log(t);
-    });
   });
 
   const showPlat = (plat) => {
@@ -53,7 +43,7 @@ const ListMain = () => {
 
   const searchHandler = (e) => {
     e.preventDefault();
-    getSearch({
+    getPlatByName({
       variables: {
         _iregex: plat,
       },
@@ -93,59 +83,34 @@ const ListMain = () => {
             </tr>
           </thead>
           <tbody>
-            {searchPlat === undefined || searchPlat?.Plat_Kendaraan.length === 2
-              ? dataPlats?.Plat_Kendaraan.map((data) => (
-                  <tr key={data.Plat}>
-                    <td>{data.Plat}</td>
-                    <td>{data.Nama}</td>
-                    <td>{data.Status}</td>
-                    <td
-                      style={{
-                        display: "flex",
-                        gap: 4,
-                      }}
-                    >
-                      <Button onClick={() => showPlat(data.Plat)}>View</Button>
-                      <ModalFormEditPlat data={data} id={data.Plat} />
-                      <Button
-                        onClick={() => {
-                          deletePlatData(data.Plat);
-                        }}
-                        type="danger"
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              : searchPlat?.Plat_Kendaraan.map((data) => (
-                  <tr>
-                    <td>{data.Plat}</td>
-                    <td>{data.Nama}</td>
-                    <td>{data.Status}</td>
-                    <td
-                      style={{
-                        display: "flex",
-                        gap: 4,
-                      }}
-                    >
-                      <Button onClick={() => showPlat(data.Plat)}>View</Button>
-                      <ModalFormEditPlat data={data} id={data.Plat} />
-                      {!errorDelPlat ? (
-                        <Button
-                          onClick={() => {
-                            deletePlatData(searchPlat?.Plat_Kendaraan[0]?.Plat);
-                          }}
-                          type="danger"
-                        >
-                          Delete
-                        </Button>
-                      ) : (
-                        alert("delete error ", errorDelPlat)
-                      )}
-                    </td>
-                  </tr>
-                ))}
+            {dataPlats?.Plats.map((data) => (
+              <tr key={data.plat}>
+                <td>{data.plat}</td>
+                <td>{data.nama}</td>
+                <td>{data.status}</td>
+                <td
+                  style={{
+                    display: "flex",
+                    gap: 4,
+                  }}
+                >
+                  <Button onClick={() => showPlat(data.plat)}>View</Button>
+                  <ModalFormEditPlat
+                    data={data}
+                    rfid={props.rfid}
+                    id={data.plat}
+                  />
+                  <Button
+                    onClick={() => {
+                      deletePlatData(data.plat);
+                    }}
+                    type="danger"
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </Card>

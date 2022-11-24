@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { UserOutlined } from "@ant-design/icons";
 import { Layout, Menu, Typography } from "antd";
 import ListMain from "../../components/ListMain";
 import ModalFormPlat from "../../components/ModalFormPlat";
+import CONST from "../../helper/Constant";
+import { io } from "socket.io-client";
 
 const Dashboard = () => {
   const { Content, Footer, Sider } = Layout;
@@ -12,6 +14,15 @@ const Dashboard = () => {
     icon: <UserOutlined />,
     label: `Dashboard`,
   }));
+  const [rfid, setRfid] = useState("");
+
+  const socket = io(CONST.SOCKET_URL);
+
+  socket.on("event", (data) => {
+    let t = JSON.parse(data.toString("utf8"));
+    setRfid(...rfid, t);
+  });
+  console.log(rfid);
   return (
     <Layout hasSider>
       <Sider
@@ -58,8 +69,8 @@ const Dashboard = () => {
             <Title style={{ margin: "20px 10px" }}>
               List Kendaraan Bermotor
             </Title>
-            <ModalFormPlat />
-            <ListMain />
+            <ModalFormPlat rfid={rfid} />
+            <ListMain rfid={rfid} />
           </div>
         </Content>
         <Footer
